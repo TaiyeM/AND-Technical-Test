@@ -1,0 +1,8 @@
+../.idea
+.idea/
+**/terraform.tfstate.backup
+**/terraform.tfstate
+**/.terraform
+**/.DS_Store
+**/.terraform.lock.hcl
+
