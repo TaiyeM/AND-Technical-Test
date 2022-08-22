@@ -9,17 +9,25 @@ resource "aws_vpc" "AND_VPC" {
   enable_dns_hostnames = true
   tags = {
     Name = "AND_VPC"
+    description = "The VPC for the webserver"
   }
 
 }
-
-resource "aws_subnet" "AND_public_subnet" {
-  vpc_id     = aws_vpc.AND_VPC.id
-  cidr_block = "10.0.1.0/24"
-  map_public_ip_on_launch = true
+# Used in Line 23 in main.tf
+data "aws_availability_zones" "Zones" {
   
+}
+resource "aws_subnet" "AND_public_subnets" {
+  vpc_id     = aws_vpc.AND_VPC.id
+  cidr_block = element(var.AND_public_subnets_cidr, count.index)
+  map_public_ip_on_launch = true
+  count = 2
+  availability_zone = data.aws_availability_zones.Zones.names[count.index]
+  
+
   tags = {
     Name = "AND_public_subnet"
+    description = "The VPC Public Subnet"
   }
 
 }
@@ -28,6 +36,7 @@ resource "aws_internet_gateway" "AND_gw" {
 
   tags = {
     Name = "AND_gw"
+    description = "The VPC Internet Gateway"
   }
 }
 
@@ -41,11 +50,13 @@ resource "aws_route_table" "AND_route_table" {
   
   tags = {
     Name = "AND_route_table"
+    description = "The VPC Route Table"
   }
 }
 
 resource "aws_route_table_association" "AND_public_subnet_association" {
-  subnet_id      = aws_subnet.AND_public_subnet.id
+  count = 2
+  subnet_id      = element(aws_subnet.AND_public_subnets.*.id, count.index)
   route_table_id = aws_route_table.AND_route_table.id
 }
   
