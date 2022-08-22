@@ -22,6 +22,7 @@ resource "aws_security_group" "AND_sg" {
 
   tags = {
     Name = "AND_sg"
+    description = "The Security group for the EC2 instances"
   }
 }
 
